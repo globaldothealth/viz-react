@@ -1,11 +1,11 @@
 import React from "react";
 
-function App() {
+const App: React.FC = () => {
   return (
     <div className="App">
       <p>VOC MAP</p>
     </div>
   );
-}
+};
 
 export default App;
