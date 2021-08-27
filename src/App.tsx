@@ -1,9 +1,13 @@
 import React from "react";
+import { GlobalStyle } from "./theme/globalStyles";
+
+import { VocMap } from "./components/VocMap";
 
 const App: React.FC = () => {
   return (
     <div className="App">
-      <p>VOC MAP</p>
+      <GlobalStyle />
+      <VocMap />
     </div>
   );
 };
