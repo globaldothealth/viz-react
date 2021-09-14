@@ -1,9 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+// eslint-disable-next-line 
+// mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 import { VocDataRow } from "../../models/VocDataRow";
 
-import data from "../../data/voc.json";
+import data from "../../data/voc-new.json";
 import {
   MapContainer,
   Sidebar,
@@ -35,27 +37,38 @@ export const VocMap: React.FC = () => {
   const [chosenVoc, setChosenVoc] = useState<string>();
 
   // Layers to be displayed on map
-  const [layers] = useState<{ id: string; color: string; label: string }[]>([
-    { id: "checked-has-data", color: "#440053", label: "Checked, has data" },
+  const [layers] = useState<{ id: string; color: string; outline: string; label: string }[]>([
+    {
+      id: "checked-has-data",
+      color: "#29b1ea",
+      outline: "#0074ab",
+      label: "Checked, has data"
+    },
     {
       id: "checked-no-data",
-      color: "#218F8C",
+      color: "#88d0eb",
+      outline: "#007AEC",
       label: "Checked, does not have data",
     },
-    { id: "not-checked", color: "#FDE624", label: "Not checked" },
+    {
+      id: "not-checked",
+      color: "#FD9986",
+      outline: "#FD685B",
+      label: "Not checked"
+    },
   ]);
 
   // Setup Mapbox and configure map
   useEffect(() => {
+    if (map.current) return;
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: process.env.REACT_APP_MAP_THEME_URL,
       center: [10, 40],
       renderWorldCopies: false,
       minZoom: 1.5,
-      zoom: 2.5,
+      zoom: 1,
     })
-      .addControl(new mapboxgl.NavigationControl())
       .on("load", () => {
         // Add layers to the map
         layers.forEach((layer) => {
@@ -71,15 +84,26 @@ export const VocMap: React.FC = () => {
               paint: {
                 "fill-color": layer.color,
                 "fill-opacity": 0,
+                "fill-outline-color": layer.outline,
                 "fill-opacity-transition": { duration: ANIMATION_DURATION },
               },
             },
             "country-label"
           );
+
+          // map.current?.on('click', layer.id, (e) => {
+          //   console.log(e.lngLat);
+          //   new mapboxgl.Popup()
+          //     .setHTML("<p>Hello</p>")
+          //     .setLngLat(e.lngLat)
+          //     .addTo(map.current);
+          // });
         });
 
         setMapLoaded(true);
-      });
+      })
+      .addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
   }, []);
 
   // Prepare data
@@ -146,7 +170,7 @@ export const VocMap: React.FC = () => {
     <>
       <MapContainer ref={mapContainer} />
       <Sidebar>
-        <VocLabel>Choose VOC</VocLabel>
+        <VocLabel>Choose Variant</VocLabel>
 
         <VocSelect onChange={handleVocChange}>
           {vocList &&

@@ -14,7 +14,7 @@ const Card = styled.div`
 `;
 
 export const Sidebar = styled(Card)`
-  top: 5rem;
+  top: 10rem;
   left: 5rem;
 `;
 
@@ -31,7 +31,7 @@ export const VocSelect = styled.select`
 `;
 
 export const Legend = styled(Card)`
-  bottom: 5rem;
+  bottom: 2.4rem;
   right: 5rem;
 `;
 
@@ -49,13 +49,13 @@ interface LegendColorSampleProps {
 }
 
 export const LegendColorSample = styled.div<LegendColorSampleProps>`
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: 0.5rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 2.4rem;
   background-color: ${(props) => props.color};
 `;
 
 export const LegendLabel = styled.p`
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   margin-left: 1rem;
 `;
