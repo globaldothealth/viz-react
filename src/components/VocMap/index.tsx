@@ -1,8 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-// eslint-disable-next-line 
-// mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 import { VocDataRow } from "../../models/VocDataRow";
 
 import data from "../../data/voc-new.json";
@@ -37,12 +35,14 @@ export const VocMap: React.FC = () => {
   const [chosenVoc, setChosenVoc] = useState<string>();
 
   // Layers to be displayed on map
-  const [layers] = useState<{ id: string; color: string; outline: string; label: string }[]>([
+  const [layers] = useState<
+    { id: string; color: string; outline: string; label: string }[]
+  >([
     {
       id: "checked-has-data",
       color: "#29b1ea",
       outline: "#0074ab",
-      label: "Checked, has data"
+      label: "Checked, has data",
     },
     {
       id: "checked-no-data",
@@ -54,7 +54,7 @@ export const VocMap: React.FC = () => {
       id: "not-checked",
       color: "#FD9986",
       outline: "#FD685B",
-      label: "Not checked"
+      label: "Not checked",
     },
   ]);
 
@@ -64,10 +64,10 @@ export const VocMap: React.FC = () => {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: process.env.REACT_APP_MAP_THEME_URL,
-      center: [10, 40],
+      center: [0, 40],
       renderWorldCopies: false,
       minZoom: 1.5,
-      zoom: 1,
+      zoom: 2.5,
     })
       .on("load", () => {
         // Add layers to the map
@@ -102,8 +102,7 @@ export const VocMap: React.FC = () => {
 
         setMapLoaded(true);
       })
-      .addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-
+      .addControl(new mapboxgl.NavigationControl(), "bottom-right");
   }, []);
 
   // Prepare data
