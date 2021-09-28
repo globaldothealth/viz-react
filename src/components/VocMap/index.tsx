@@ -29,7 +29,7 @@ export const VocMap: React.FC = () => {
   mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN || "";
 
   // eslint-disable-next-line
-  const mapContainer = useRef<any>("");
+  const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [vocData, setVocData] = useState<VocDataRow[]>();
@@ -40,8 +40,8 @@ export const VocMap: React.FC = () => {
   const [layers] = useState<{ id: string; color: string; outline: string; label: string }[]>([
     {
       id: "checked-has-data",
-      color: "#29b1ea",
-      outline: "#0074ab",
+      color: "#00c6af",
+      outline: "#0e7569",
       label: "Checked, has data"
     },
     {
@@ -60,9 +60,9 @@ export const VocMap: React.FC = () => {
 
   // Setup Mapbox and configure map
   useEffect(() => {
-    if (map.current) return;
+    // if (map.current) return;
     map.current = new mapboxgl.Map({
-      container: mapContainer.current,
+      container: mapContainer.current || '',
       style: process.env.REACT_APP_MAP_THEME_URL,
       center: [10, 40],
       renderWorldCopies: false,
@@ -91,16 +91,18 @@ export const VocMap: React.FC = () => {
             "country-label"
           );
 
-          // map.current?.on('click', layer.id, (e) => {
-          //   console.log(e.lngLat);
-          //   new mapboxgl.Popup()
-          //     .setHTML("<p>Hello</p>")
-          //     .setLngLat(e.lngLat)
-          //     .addTo(map.current);
-          // });
+          setMapLoaded(true);
+
+          map.current?.on('click', layer.id, (e) => {
+            console.log(e.lngLat);
+            console.log("features: ", e.features);
+            new mapboxgl.Popup()
+              .setHTML("<p>Hello</p>")
+              .setLngLat(e.lngLat)
+              .addTo(map.current);
+          });
         });
 
-        setMapLoaded(true);
       })
       .addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
