@@ -1,8 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-// eslint-disable-next-line 
-// mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 import { VocDataRow } from "../../models/VocDataRow";
 
 import data from "../../data/voc-new.json";
@@ -21,6 +19,7 @@ import {
   getVocList,
   getMostRecentData,
   sortData,
+  getDetailedData,
 } from "../../utils/helperFunctions";
 
 const ANIMATION_DURATION = 500; // map animation duration in ms
@@ -35,14 +34,20 @@ export const VocMap: React.FC = () => {
   const [vocData, setVocData] = useState<VocDataRow[]>();
   const [vocList, setVocList] = useState<string[]>();
   const [chosenVoc, setChosenVoc] = useState<string>();
+  const [popupState, setPopupState] = useState<{
+    lngLat: mapboxgl.LngLat;
+    locationCode: string;
+  }>();
 
   // Layers to be displayed on map
-  const [layers] = useState<{ id: string; color: string; outline: string; label: string }[]>([
+  const [layers] = useState<
+    { id: string; color: string; outline: string; label: string }[]
+  >([
     {
       id: "checked-has-data",
       color: "#00c6af",
       outline: "#0e7569",
-      label: "Checked, has data"
+      label: "Checked, has data",
     },
     {
       id: "checked-no-data",
@@ -54,15 +59,22 @@ export const VocMap: React.FC = () => {
       id: "not-checked",
       color: "#FD9986",
       outline: "#FD685B",
-      label: "Not checked"
+      label: "Not checked",
     },
   ]);
+
+  const renderedPopupContent = (
+    sourceUrl: string,
+    dateChecked: string
+  ): string =>
+    `<p><strong>Source url:</strong> <a href="${sourceUrl}" target="_blank">${sourceUrl}</a></p>
+    <p><strong>Date checked:</strong> ${dateChecked}</p>`;
 
   // Setup Mapbox and configure map
   useEffect(() => {
     // if (map.current) return;
     map.current = new mapboxgl.Map({
-      container: mapContainer.current || '',
+      container: mapContainer.current || "",
       style: process.env.REACT_APP_MAP_THEME_URL,
       center: [10, 40],
       renderWorldCopies: false,
@@ -70,9 +82,12 @@ export const VocMap: React.FC = () => {
       zoom: 1,
     })
       .on("load", () => {
+        const mapRef = map.current;
+        if (!mapRef) return;
+
         // Add layers to the map
         layers.forEach((layer) => {
-          map.current?.addLayer(
+          mapRef.addLayer(
             {
               id: layer.id,
               source: {
@@ -91,22 +106,47 @@ export const VocMap: React.FC = () => {
             "country-label"
           );
 
-          setMapLoaded(true);
+          // Display a popup with selected data details
+          mapRef.on("click", layer.id, (e) => {
+            const { lngLat, features } = e;
+            if (!features || features.length === 0 || !features[0].properties)
+              return;
 
-          map.current?.on('click', layer.id, (e) => {
-            console.log(e.lngLat);
-            console.log("features: ", e.features);
-            new mapboxgl.Popup()
-              .setHTML("<p>Hello</p>")
-              .setLngLat(e.lngLat)
-              .addTo(map.current);
+            const locationCode = features[0].properties
+              .iso_3166_1_alpha_3 as string;
+
+            setPopupState({ lngLat, locationCode });
+          });
+
+          mapRef.on("mouseenter", layer.id, () => {
+            mapRef.getCanvas().style.cursor = "pointer";
+          });
+
+          mapRef.on("mouseleave", layer.id, () => {
+            mapRef.getCanvas().style.cursor = "";
           });
         });
 
+        setMapLoaded(true);
       })
-      .addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-
+      .addControl(new mapboxgl.NavigationControl(), "bottom-right");
   }, []);
+
+  // Display popup on the map with detailed data
+  useEffect(() => {
+    const mapRef = map.current;
+    if (!popupState || !mapRef || !vocData) return;
+
+    const { lngLat, locationCode } = popupState;
+
+    // Get source url and date checked based on clicked location
+    const { sourceUrl, dateChecked } = getDetailedData(vocData, locationCode);
+
+    new mapboxgl.Popup({ className: "custom-popup" })
+      .setHTML(renderedPopupContent(sourceUrl, dateChecked))
+      .setLngLat(lngLat)
+      .addTo(mapRef);
+  }, [popupState]);
 
   // Prepare data
   useEffect(() => {

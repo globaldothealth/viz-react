@@ -84,3 +84,18 @@ export const sortData = (
 
   return { countriesWithData, countriesWithoutData, countriesNotChecked };
 };
+
+// Get source URL and date for specific country
+export const getDetailedData = (
+  dataList: VocDataRow[],
+  locationCode: string
+): { sourceUrl: string; dateChecked: string } => {
+  const chosenCountry = dataList.filter(
+    (dataRow) => dataRow.code === locationCode
+  );
+
+  return {
+    sourceUrl: chosenCountry[0].source_url,
+    dateChecked: chosenCountry[0].epi_date,
+  };
+};

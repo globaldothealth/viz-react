@@ -67,4 +67,9 @@ export const GlobalStyle = createGlobalStyle`
         vertical-align: middle;
         text-decoration: none;
     }
+    .custom-popup {
+        font-size: 16px;        
+        width: auto;
+        overflow: hidden;        
+    }
 `;
