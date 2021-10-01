@@ -65,10 +65,12 @@ export const VocMap: React.FC = () => {
 
   const renderedPopupContent = (
     sourceUrl: string,
-    dateChecked: string
+    countryName: string,
+    dateChecked: string,
+    breakthrough: string
   ): string =>
-    `<p><strong>Source url:</strong> <a href="${sourceUrl}" target="_blank">${sourceUrl}</a></p>
-    <p><strong>Date checked:</strong> ${dateChecked}</p>`;
+    `<h2>${countryName}</h2><hr><p><a class="button" href="${sourceUrl}" target="_blank">Go To Source</a></p>
+    <p><strong>Date checked:</strong> ${dateChecked}</p><p><strong>Breakthrough Status:</strong> ${breakthrough}</p>`;
 
   // Setup Mapbox and configure map
   useEffect(() => {
@@ -140,10 +142,10 @@ export const VocMap: React.FC = () => {
     const { lngLat, locationCode } = popupState;
 
     // Get source url and date checked based on clicked location
-    const { sourceUrl, dateChecked } = getDetailedData(vocData, locationCode);
+    const { sourceUrl, countryName, dateChecked, breakthrough } = getDetailedData(vocData, locationCode);
 
     new mapboxgl.Popup({ className: "custom-popup" })
-      .setHTML(renderedPopupContent(sourceUrl, dateChecked))
+      .setHTML(renderedPopupContent(sourceUrl, countryName, dateChecked, breakthrough))
       .setLngLat(lngLat)
       .addTo(mapRef);
   }, [popupState]);

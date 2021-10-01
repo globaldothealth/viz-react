@@ -89,13 +89,15 @@ export const sortData = (
 export const getDetailedData = (
   dataList: VocDataRow[],
   locationCode: string
-): { sourceUrl: string; dateChecked: string } => {
+): { countryName: string; sourceUrl: string; dateChecked: string, breakthrough: string } => {
   const chosenCountry = dataList.filter(
     (dataRow) => dataRow.code === locationCode
   );
 
   return {
     sourceUrl: chosenCountry[0].source_url,
+    countryName: chosenCountry[0].location,
     dateChecked: chosenCountry[0].epi_date,
+    breakthrough: chosenCountry[0].breakthrough_status,
   };
 };
