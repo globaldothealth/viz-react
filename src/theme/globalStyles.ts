@@ -1,4 +1,4 @@
-import { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 
 export const GlobalStyle = createGlobalStyle`
     html {
@@ -67,4 +67,12 @@ export const GlobalStyle = createGlobalStyle`
         vertical-align: middle;
         text-decoration: none;
     }
+`;
+
+export const Card = styled.div`
+  position: absolute;
+  background-color: white;
+  z-index: 100;
+  padding: 2rem;
+  border-radius: 0.5rem;
 `;

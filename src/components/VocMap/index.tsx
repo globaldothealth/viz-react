@@ -1,16 +1,13 @@
 import React, { useRef, useEffect, useState } from "react";
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-// eslint-disable-next-line 
+// eslint-disable-next-line
 // mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 import { VocDataRow } from "../../models/VocDataRow";
 
 import data from "../../data/voc-new.json";
 import {
   MapContainer,
-  Sidebar,
-  VocSelect,
-  VocLabel,
   Legend,
   LegendRow,
   LegendColorSample,
@@ -22,6 +19,7 @@ import {
   getMostRecentData,
   sortData,
 } from "../../utils/helperFunctions";
+import { Sidebar } from "../Sidebar";
 
 const ANIMATION_DURATION = 500; // map animation duration in ms
 
@@ -37,12 +35,14 @@ export const VocMap: React.FC = () => {
   const [chosenVoc, setChosenVoc] = useState<string>();
 
   // Layers to be displayed on map
-  const [layers] = useState<{ id: string; color: string; outline: string; label: string }[]>([
+  const [layers] = useState<
+    { id: string; color: string; outline: string; label: string }[]
+  >([
     {
       id: "checked-has-data",
       color: "#29b1ea",
       outline: "#0074ab",
-      label: "Checked, has data"
+      label: "Checked, has data",
     },
     {
       id: "checked-no-data",
@@ -54,7 +54,7 @@ export const VocMap: React.FC = () => {
       id: "not-checked",
       color: "#FD9986",
       outline: "#FD685B",
-      label: "Not checked"
+      label: "Not checked",
     },
   ]);
 
@@ -102,8 +102,7 @@ export const VocMap: React.FC = () => {
 
         setMapLoaded(true);
       })
-      .addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-
+      .addControl(new mapboxgl.NavigationControl(), "bottom-right");
   }, []);
 
   // Prepare data
@@ -149,8 +148,10 @@ export const VocMap: React.FC = () => {
     }, ANIMATION_DURATION);
   }, [vocData, mapLoaded, chosenVoc]);
 
-  const handleVocChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setChosenVoc(e.target.value);
+  const handleVariantChange = (
+    e: React.ChangeEvent<HTMLSelectElement> | string
+  ) => {
+    setChosenVoc(typeof e === "string" ? e : e.target.value);
   };
 
   const setLayersOpacity = (opacity: number) => {
@@ -169,18 +170,14 @@ export const VocMap: React.FC = () => {
   return (
     <>
       <MapContainer ref={mapContainer} />
-      <Sidebar>
-        <VocLabel>Choose Variant</VocLabel>
 
-        <VocSelect onChange={handleVocChange}>
-          {vocList &&
-            vocList.map((voc) => (
-              <option key={voc} value={voc}>
-                {voc.replace("total_", "")}
-              </option>
-            ))}
-        </VocSelect>
-      </Sidebar>
+      {vocList && (
+        <Sidebar
+          handleVariantChange={handleVariantChange}
+          vocList={vocList}
+          voiList={["voi_1", "voi_2", "voi_3"]}
+        />
+      )}
 
       <Legend>{renderedLabelItems}</Legend>
     </>
