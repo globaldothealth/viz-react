@@ -31,7 +31,6 @@ export const VocMap: React.FC = () => {
   const map = useRef<Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [vocData, setVocData] = useState<VocDataRow[]>();
-  const [vocList, setVocList] = useState<string[]>();
   const [chosenVoc, setChosenVoc] = useState<string>();
 
   // Layers to be displayed on map
@@ -112,7 +111,6 @@ export const VocMap: React.FC = () => {
     const mostRecentData = getMostRecentData(rowsWithVoc);
 
     setVocData(mostRecentData);
-    setVocList(list);
     setChosenVoc(list[0]);
   }, []);
 
@@ -171,13 +169,7 @@ export const VocMap: React.FC = () => {
     <>
       <MapContainer ref={mapContainer} />
 
-      {vocList && (
-        <Sidebar
-          handleVariantChange={handleVariantChange}
-          vocList={vocList}
-          voiList={["voi_1", "voi_2", "voi_3"]}
-        />
-      )}
+      <Sidebar handleVariantChange={handleVariantChange} />
 
       <Legend>{renderedLabelItems}</Legend>
     </>

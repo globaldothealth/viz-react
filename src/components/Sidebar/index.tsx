@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import useGoogleSheets from "use-google-sheets";
 
 import {
   SidebarContainer,
@@ -12,8 +13,6 @@ interface SidebarProps {
   handleVariantChange: (
     e: React.ChangeEvent<HTMLSelectElement> | string
   ) => void;
-  vocList: string[];
-  voiList: string[];
 }
 
 enum VariantType {
@@ -23,10 +22,37 @@ enum VariantType {
 
 export const Sidebar: React.FC<SidebarProps> = ({
   handleVariantChange,
-  vocList,
-  voiList,
 }: SidebarProps) => {
   const [variantType, setVariantType] = useState(VariantType.VOC);
+  const [vocList, setVocList] = useState<string[]>([]);
+  const [voiList, setVoiList] = useState<string[]>([]);
+
+  // Get data from Google sheets
+  const { data, loading, error } = useGoogleSheets({
+    apiKey: process.env.REACT_APP_GOOGLE_API_KEY || "",
+    sheetId: process.env.REACT_APP_SHEETS_ID || "",
+    sheetsNames: [process.env.REACT_APP_SHEET_NAME || ""],
+  });
+
+  // Parse VoC and VoI from spreadsheet
+  useEffect(() => {
+    if (error) alert(error);
+    if (!data || loading) return;
+
+    console.log(data);
+
+    const { VoC, VoI } = data[0].data[0] as { VoC: string; VoI: string };
+
+    let vocArray = VoC.split(";");
+    let voiArray = VoI.split(";");
+
+    // Remove white spaces from each array element
+    vocArray = vocArray.map((element) => element.trim());
+    voiArray = voiArray.map((element) => element.trim());
+
+    setVocList(vocArray);
+    setVoiList(voiArray);
+  }, [loading, data, error]);
 
   const handleVariantTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVariantType = e.target.value as VariantType;
