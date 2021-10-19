@@ -1,8 +1,14 @@
 import styled from "styled-components";
 
-export const MapContainer = styled.div`
+interface MapContainerProps {
+  visible: boolean;
+}
+
+export const MapContainer = styled.div<MapContainerProps>`
   width: 100vw;
   height: 100vh;
+  opacity: ${(props) => (props.visible ? "1" : "0")};
+  transition: opacity 0.3s ease-in-out;
 `;
 
 const Card = styled.div`
