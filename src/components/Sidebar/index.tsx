@@ -39,8 +39,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (error) alert(error);
     if (!data || loading) return;
 
-    console.log(data);
-
     const { VoC, VoI } = data[0].data[0] as { VoC: string; VoI: string };
 
     let vocArray = VoC.split(";");

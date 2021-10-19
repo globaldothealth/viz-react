@@ -44,7 +44,6 @@ export const VocMap: React.FC = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [vocData, setVocData] = useState<VocDataRow[]>();
   const [vocStatesData, setVocStatesData] = useState<StatesData[]>();
-  const [vocList, setVocList] = useState<string[]>();
   const [chosenVoc, setChosenVoc] = useState<string>();
   const [isLoading, setIsLoading] = useState(true);
 
