@@ -1,38 +1,44 @@
 import styled from "styled-components";
 
-export const MapContainer = styled.div`
+interface MapContainerProps {
+  visible: boolean;
+}
+
+export const MapContainer = styled.div<MapContainerProps>`
   width: 100vw;
   height: 100vh;
+  opacity: ${(props) => (props.visible ? "1" : "0")};
+  transition: opacity 0.3s ease-in-out;
 `;
 
 const Card = styled.div`
   position: absolute;
   background-color: white;
   z-index: 100;
-  padding: 2rem;
-  border-radius: 0.5rem;
+  padding: 20px;
+  border-radius: 5px;
 `;
 
 export const Sidebar = styled(Card)`
-  top: 10rem;
-  left: 5rem;
+  top: 100px;
+  left: 50px;
 `;
 
 export const VocLabel = styled.p`
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
+  font-size: 12px;
+  margin-bottom: 10px;
   font-weight: bold;
 `;
 
 export const VocSelect = styled.select`
-  padding: 1rem;
-  border-radius: 0.5rem;
+  padding: 10px;
+  border-radius: 5px;
   cursor: pointer;
 `;
 
 export const Legend = styled(Card)`
-  bottom: 2.4rem;
-  right: 5rem;
+  bottom: 24px;
+  right: 50px;
 `;
 
 export const LegendRow = styled.div`
@@ -40,7 +46,7 @@ export const LegendRow = styled.div`
   align-items: center;
 
   &:not(:last-of-type) {
-    margin-bottom: 1rem;
+    margin-bottom: 10px;
   }
 `;
 
@@ -49,13 +55,13 @@ interface LegendColorSampleProps {
 }
 
 export const LegendColorSample = styled.div<LegendColorSampleProps>`
-  width: 1.2rem;
-  height: 1.2rem;
-  border-radius: 2.4rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 24px;
   background-color: ${(props) => props.color};
 `;
 
 export const LegendLabel = styled.p`
-  font-size: 1.4rem;
-  margin-left: 1rem;
+  font-size: 14px;
+  margin-left: 10px;
 `;
