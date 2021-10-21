@@ -17,7 +17,7 @@ export const GlobalStyle = createGlobalStyle`
     a {
         text-decoration: none;
         outline: none;
-        color: inherit;
+        color: inherit;        
     }   
     .custom-popup {
         z-index: 1000;
@@ -29,6 +29,7 @@ export const GlobalStyle = createGlobalStyle`
         display: block;
         margin-bottom: 10px;
         line-height: 1.2em;
+        margin: 0;
     }
     .mapboxgl-popup-content .button {
         background: #0094e2;
@@ -38,7 +39,7 @@ export const GlobalStyle = createGlobalStyle`
         font-size: 12px;
         text-transform: uppercase;
         border-radius: 4px;
-        display: inline-block;
+        display: inline-block;        
     }
 
     .mapboxgl-popup-content .button:hover {
@@ -46,6 +47,7 @@ export const GlobalStyle = createGlobalStyle`
     }
     .mapboxgl-popup-content p {
         font-size: 14px;
+        margin: 0;
     }          
 `;
 

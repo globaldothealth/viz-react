@@ -29,9 +29,10 @@ export const LegendColorSample = styled.div<LegendColorSampleProps>`
   height: 12px;
   border-radius: 24px;
   background-color: ${(props) => props.color};
+  margin-right: 10px;
 `;
 
 export const LegendLabel = styled.p`
   font-size: 14px;
-  margin-left: 10px;
+  margin: 0;
 `;
