@@ -14,6 +14,11 @@ export const GlobalStyle = createGlobalStyle`
         padding: 0;
         box-sizing: border-box;
     }
+    a {
+        text-decoration: none;
+        outline: none;
+        color: inherit;
+    }   
     .custom-popup {
         font-size: 16px;        
         width: auto;

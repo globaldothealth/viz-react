@@ -15,16 +15,14 @@ import {
   LegendLabel,
 } from "./styled";
 import {
-  getRowsWithVocData,
+  getCountriesWithAnyData,
   getVocList,
-  getMostRecentData,
+  getMostRecentCountryData,
+  getMostRecentStatesData,
   sortData,
   getDetailedData,
-  filterLookupTable,
-  parseStatesData,
+  sortStatesData,
 } from "../../utils/helperFunctions";
-import { StatesData } from "../../data/statesData";
-import lookupTable from "../../data/mapbox-boundaries-adm1-v3_3.json";
 
 enum FillColor {
   CheckedHasData = "#00c6af",
@@ -38,6 +36,30 @@ enum OutlineColor {
   NotChecked = "#FD685B",
 }
 
+// Layers to be displayed on map
+const layers = [
+  {
+    id: "checked-has-data",
+    color: FillColor.CheckedHasData,
+    outline: OutlineColor.CheckedHasData,
+    label: "Checked, has data",
+  },
+  {
+    id: "checked-no-data",
+    color: FillColor.CheckedNoData,
+    outline: OutlineColor.CheckedNoData,
+    label: "Checked, does not have data",
+  },
+  {
+    id: "not-checked",
+    color: FillColor.NotChecked,
+    outline: OutlineColor.NotChecked,
+    label: "Not checked",
+  },
+];
+
+const ANIMATION_DURATION = 500; // map animation duration in ms
+
 export const VocMap: React.FC = () => {
   mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN || "";
 
@@ -45,39 +67,15 @@ export const VocMap: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [vocData, setVocData] = useState<VocDataRow[]>();
-  const [vocStatesData, setVocStatesData] = useState<StatesData[]>();
+  const [vocCountryData, setVocCountryData] = useState<VocDataRow[]>();
+  const [vocStateData, setVocStateData] = useState<VocDataRow[]>();
   const [vocList, setVocList] = useState<string[]>();
   const [chosenVoc, setChosenVoc] = useState<string>();
   const [popupState, setPopupState] = useState<{
     lngLat: mapboxgl.LngLat;
     locationCode: string;
+    stateResolution: boolean;
   }>();
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Layers to be displayed on map
-  const [layers] = useState<
-    { id: string; color: string; outline: string; label: string }[]
-  >([
-    {
-      id: "checked-has-data",
-      color: FillColor.CheckedHasData,
-      outline: OutlineColor.CheckedHasData,
-      label: "Checked, has data",
-    },
-    {
-      id: "checked-no-data",
-      color: FillColor.CheckedNoData,
-      outline: OutlineColor.CheckedNoData,
-      label: "Checked, does not have data",
-    },
-    {
-      id: "not-checked",
-      color: FillColor.NotChecked,
-      outline: OutlineColor.NotChecked,
-      label: "Not checked",
-    },
-  ]);
 
   const renderedPopupContent = (
     sourceUrl: string,
@@ -108,8 +106,14 @@ export const VocMap: React.FC = () => {
           url: "mapbox://mapbox.country-boundaries-v1",
         });
 
+        mapRef.addSource("states", {
+          type: "geojson",
+          data: "https://docs.mapbox.com/mapbox-gl-js/assets/us_states.geojson",
+        });
+
         // Add layers to the map
         layers.forEach((layer) => {
+          // Layer for countries
           mapRef.addLayer(
             {
               id: layer.id,
@@ -119,9 +123,27 @@ export const VocMap: React.FC = () => {
               paint: {
                 "fill-color": layer.color,
                 "fill-outline-color": layer.outline,
+                "fill-opacity": 0,
+                "fill-opacity-transition": { duration: ANIMATION_DURATION },
               },
             },
             "country-label"
+          );
+
+          // Layer for US states
+          mapRef.addLayer(
+            {
+              id: `states-${layer.id}`,
+              source: "states",
+              type: "fill",
+              paint: {
+                "fill-color": layer.color,
+                "fill-outline-color": layer.outline,
+                "fill-opacity": 0,
+                "fill-opacity-transition": { duration: ANIMATION_DURATION },
+              },
+            },
+            "waterway-label"
           );
 
           // Display a popup with selected data details
@@ -133,9 +155,21 @@ export const VocMap: React.FC = () => {
             const locationCode = features[0].properties
               .iso_3166_1_alpha_3 as string;
 
-            setPopupState({ lngLat, locationCode });
+            setPopupState({ lngLat, locationCode, stateResolution: false });
           });
 
+          // Display a popup with selected data details when clicking on individual state
+          mapRef.on("click", `states-${layer.id}`, (e) => {
+            const { lngLat, features } = e;
+            if (!features || features.length === 0 || !features[0].properties)
+              return;
+
+            const locationCode = features[0].properties.STATE_NAME as string;
+
+            setPopupState({ lngLat, locationCode, stateResolution: true });
+          });
+
+          // Change cursor to pointer when hovering above countries
           mapRef.on("mouseenter", layer.id, () => {
             mapRef.getCanvas().style.cursor = "pointer";
           });
@@ -143,66 +177,18 @@ export const VocMap: React.FC = () => {
           mapRef.on("mouseleave", layer.id, () => {
             mapRef.getCanvas().style.cursor = "";
           });
+
+          // Change cursor to pointer when hovering above US states
+          mapRef.on("mouseenter", `states-${layer.id}`, () => {
+            mapRef.getCanvas().style.cursor = "pointer";
+          });
+
+          mapRef.on("mouseleave", `states-${layer.id}`, () => {
+            mapRef.getCanvas().style.cursor = "";
+          });
         });
 
-        // Add Mapbox Boundaries source for state polygons.
-        mapRef.addSource("statesData", {
-          type: "vector",
-          url: "mapbox://mapbox.boundaries-adm1-v3",
-        });
-
-        // Add layer from the vector tile source with data-driven style
-        mapRef.addLayer(
-          {
-            id: "states-join",
-            type: "fill",
-            source: "statesData",
-            "source-layer": "boundaries_admin_1",
-            paint: {
-              "fill-color": [
-                "case",
-                ["==", ["feature-state", "variantStatus"], 0],
-                "rgba(136, 208, 235, 1)",
-                ["==", ["feature-state", "variantStatus"], 1],
-                "rgba(41, 177, 234, 1)",
-                ["==", ["feature-state", "variantStatus"], ""],
-                "rgba(253, 153, 134, 1)",
-                "rgba(255, 255, 255, 0)",
-              ],
-              "fill-outline-color": [
-                "case",
-                ["==", ["feature-state", "variantStatus"], 0],
-                "rgba(0, 122, 236, 1)",
-                ["==", ["feature-state", "variantStatus"], 1],
-                "rgba(0, 116, 171, 1)",
-                ["==", ["feature-state", "variantStatus"], ""],
-                "rgba(253, 104, 91, 1)",
-                "rgba(255, 255, 255, 0)",
-              ],
-            },
-          },
-          "waterway-label"
-        );
-
-        // After states source is loaded handler
-        const setAfterLoad = ({
-          sourceID,
-          isSourceLoaded,
-        }: {
-          sourceID: string;
-          isSourceLoaded: boolean;
-        }) => {
-          if (sourceID !== "statesData" && !isSourceLoaded) return;
-
-          setMapLoaded(true);
-          map.current?.off("sourcedata", setAfterLoad);
-        };
-
-        if (map.current?.isSourceLoaded("statesData")) {
-          setMapLoaded(true);
-        } else {
-          map.current?.on("sourcedata", setAfterLoad);
-        }
+        setMapLoaded(true);
       })
       .addControl(new mapboxgl.NavigationControl(), "bottom-right");
   }, []);
@@ -210,13 +196,16 @@ export const VocMap: React.FC = () => {
   // Display popup on the map with detailed data
   useEffect(() => {
     const mapRef = map.current;
-    if (!popupState || !mapRef || !vocData) return;
+    if (!popupState || !mapRef || !vocCountryData || !vocStateData) return;
 
-    const { lngLat, locationCode } = popupState;
+    const { lngLat, locationCode, stateResolution } = popupState;
 
     // Get source url and date checked based on clicked location
     const { sourceUrl, countryName, dateChecked, breakthrough } =
-      getDetailedData(vocData, locationCode);
+      getDetailedData(
+        stateResolution ? vocStateData : vocCountryData,
+        locationCode
+      );
 
     new mapboxgl.Popup({ className: "custom-popup" })
       .setHTML(
@@ -228,79 +217,86 @@ export const VocMap: React.FC = () => {
 
   // Prepare data
   useEffect(() => {
-    // Country resolution
-    const rowsWithVoc = getRowsWithVocData(data as VocDataRow[]);
-    const list = getVocList(rowsWithVoc);
-    const mostRecentData = getMostRecentData(rowsWithVoc);
+    const countriesWithAnyData = getCountriesWithAnyData(data as VocDataRow[]);
+    const mostRecentCountryData = getMostRecentCountryData(
+      data as VocDataRow[]
+    );
+    const list = getVocList(countriesWithAnyData);
+    const mostRecentVocStateData = getMostRecentStatesData(
+      data as VocDataRow[]
+    );
 
-    setVocData(mostRecentData);
+    setVocStateData(mostRecentVocStateData);
+    setVocCountryData(mostRecentCountryData);
     setVocList(list);
     setChosenVoc(list[0]);
   }, []);
 
-  // Prepare states data
+  // Display countries and states on the map
   useEffect(() => {
-    if (!chosenVoc) return;
+    const mapRef = map.current;
 
-    const statesData = parseStatesData(data as VocDataRow[], chosenVoc);
-    setVocStatesData(statesData);
-  }, [chosenVoc]);
-
-  // Display US states on map
-  useEffect(() => {
-    if (!map.current || !mapLoaded || !vocStatesData) return;
-
-    const setStates = (lookupData: any) => {
-      for (const { stateId, status } of vocStatesData) {
-        map.current?.setFeatureState(
-          {
-            source: "statesData",
-            sourceLayer: "boundaries_admin_1",
-            id: lookupData[stateId].feature_id,
-          },
-          {
-            variantStatus: status,
-          }
-        );
-      }
-    };
-
-    const lookupData = filterLookupTable(lookupTable);
-    setStates(lookupData);
-  }, [mapLoaded, vocStatesData]);
-
-  // Display countries on map
-  useEffect(() => {
-    if (!vocData || !map.current || !mapLoaded || !chosenVoc) return;
+    if (!vocCountryData || !mapRef || !mapLoaded || !chosenVoc) return;
 
     const { countriesWithData, countriesWithoutData, countriesNotChecked } =
-      sortData(vocData, chosenVoc);
+      sortData(vocCountryData, chosenVoc);
 
-    map.current?.setFilter("checked-has-data", [
-      "in",
-      "iso_3166_1_alpha_3",
-      ...countriesWithData,
-    ]);
+    const { statesWithData, statesWithoutData, statesNotChecked } =
+      sortStatesData(data as VocDataRow[], chosenVoc);
 
-    map.current?.setFilter("checked-no-data", [
-      "in",
-      "iso_3166_1_alpha_3",
-      ...countriesWithoutData,
-    ]);
+    setLayersOpacity(0);
 
-    map.current?.setFilter("not-checked", [
-      "in",
-      "iso_3166_1_alpha_3",
-      ...countriesNotChecked,
-    ]);
+    setTimeout(() => {
+      mapRef.setFilter("checked-has-data", [
+        "in",
+        "iso_3166_1_alpha_3",
+        ...countriesWithData,
+      ]);
 
-    // In order to avoid flickering during first render
-    if (isLoading) {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 200);
-    }
-  }, [vocData, mapLoaded, chosenVoc]);
+      mapRef.setFilter("checked-no-data", [
+        "in",
+        "iso_3166_1_alpha_3",
+        ...countriesWithoutData,
+      ]);
+
+      mapRef.setFilter("not-checked", [
+        "in",
+        "iso_3166_1_alpha_3",
+        ...countriesNotChecked,
+      ]);
+
+      mapRef.setFilter("states-checked-has-data", [
+        "in",
+        "STATE_ID",
+        ...statesWithData,
+      ]);
+
+      mapRef.setFilter("states-checked-no-data", [
+        "in",
+        "STATE_ID",
+        ...statesWithoutData,
+      ]);
+
+      mapRef.setFilter("states-not-checked", [
+        "in",
+        "STATE_ID",
+        ...statesNotChecked,
+      ]);
+
+      setLayersOpacity(1);
+    }, ANIMATION_DURATION);
+  }, [vocCountryData, mapLoaded, chosenVoc]);
+
+  const setLayersOpacity = (opacity: number) => {
+    layers.forEach((layer) => {
+      map.current?.setPaintProperty(layer.id, "fill-opacity", opacity);
+      map.current?.setPaintProperty(
+        `states-${layer.id}`,
+        "fill-opacity",
+        opacity
+      );
+    });
+  };
 
   const handleVocChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setChosenVoc(e.target.value);
@@ -315,7 +311,7 @@ export const VocMap: React.FC = () => {
 
   return (
     <>
-      <MapContainer ref={mapContainer} visible={!isLoading} />
+      <MapContainer ref={mapContainer} />
       <Sidebar>
         <VocLabel>Choose Variant</VocLabel>
 
