@@ -6,9 +6,6 @@ import { VocDataRow } from "../../models/VocDataRow";
 import data from "../../data/voc-new.json";
 import {
   MapContainer,
-  Sidebar,
-  VocSelect,
-  VocLabel,
   Legend,
   LegendRow,
   LegendColorSample,
@@ -22,6 +19,7 @@ import {
   filterLookupTable,
   parseStatesData,
 } from "../../utils/helperFunctions";
+import { Sidebar } from "../Sidebar";
 import { StatesData } from "../../data/statesData";
 import lookupTable from "../../data/mapbox-boundaries-adm1-v3_3.json";
 
@@ -46,7 +44,6 @@ export const VocMap: React.FC = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [vocData, setVocData] = useState<VocDataRow[]>();
   const [vocStatesData, setVocStatesData] = useState<StatesData[]>();
-  const [vocList, setVocList] = useState<string[]>();
   const [chosenVoc, setChosenVoc] = useState<string>();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -178,7 +175,6 @@ export const VocMap: React.FC = () => {
     const mostRecentData = getMostRecentData(rowsWithVoc);
 
     setVocData(mostRecentData);
-    setVocList(list);
     setChosenVoc(list[0]);
   }, []);
 
@@ -246,8 +242,10 @@ export const VocMap: React.FC = () => {
     }
   }, [vocData, mapLoaded, chosenVoc]);
 
-  const handleVocChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setChosenVoc(e.target.value);
+  const handleVariantChange = (
+    e: React.ChangeEvent<HTMLSelectElement> | string
+  ) => {
+    setChosenVoc(typeof e === "string" ? e : e.target.value);
   };
 
   const renderedLabelItems = layers.map((layer) => (
@@ -260,18 +258,8 @@ export const VocMap: React.FC = () => {
   return (
     <>
       <MapContainer ref={mapContainer} visible={!isLoading} />
-      <Sidebar>
-        <VocLabel>Choose Variant</VocLabel>
 
-        <VocSelect onChange={handleVocChange}>
-          {vocList &&
-            vocList.map((voc) => (
-              <option key={voc} value={voc}>
-                {voc.replace("total_", "")}
-              </option>
-            ))}
-        </VocSelect>
-      </Sidebar>
+      <Sidebar handleVariantChange={handleVariantChange} />
 
       <Legend>{renderedLabelItems}</Legend>
     </>
