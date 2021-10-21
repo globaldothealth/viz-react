@@ -6,9 +6,6 @@ import { VocDataRow } from "../../models/VocDataRow";
 import data from "../../data/voc-new.json";
 import {
   MapContainer,
-  Sidebar,
-  VocSelect,
-  VocLabel,
   Legend,
   LegendRow,
   LegendColorSample,
@@ -23,6 +20,7 @@ import {
   getDetailedData,
   sortStatesData,
 } from "../../utils/helperFunctions";
+import { Sidebar } from "../Sidebar";
 
 enum FillColor {
   CheckedHasData = "#00c6af",
@@ -69,7 +67,6 @@ export const VocMap: React.FC = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [vocCountryData, setVocCountryData] = useState<VocDataRow[]>();
   const [vocStateData, setVocStateData] = useState<VocDataRow[]>();
-  const [vocList, setVocList] = useState<string[]>();
   const [chosenVoc, setChosenVoc] = useState<string>();
   const [popupState, setPopupState] = useState<{
     lngLat: mapboxgl.LngLat;
@@ -298,8 +295,10 @@ export const VocMap: React.FC = () => {
     });
   };
 
-  const handleVocChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setChosenVoc(e.target.value);
+  const handleVariantChange = (
+    e: React.ChangeEvent<HTMLSelectElement> | string
+  ) => {
+    setChosenVoc(typeof e === "string" ? e : e.target.value);
   };
 
   const renderedLabelItems = layers.map((layer) => (
@@ -312,18 +311,8 @@ export const VocMap: React.FC = () => {
   return (
     <>
       <MapContainer ref={mapContainer} />
-      <Sidebar>
-        <VocLabel>Choose Variant</VocLabel>
 
-        <VocSelect onChange={handleVocChange}>
-          {vocList &&
-            vocList.map((voc) => (
-              <option key={voc} value={voc}>
-                {voc.replace("total_", "")}
-              </option>
-            ))}
-        </VocSelect>
-      </Sidebar>
+      <Sidebar handleVariantChange={handleVariantChange} />
 
       <Legend>{renderedLabelItems}</Legend>
     </>
