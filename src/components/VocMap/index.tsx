@@ -12,8 +12,6 @@ import {
   LegendLabel,
 } from "./styled";
 import {
-  getCountriesWithAnyData,
-  getVocList,
   getMostRecentCountryData,
   getMostRecentStatesData,
   sortData,
@@ -214,19 +212,15 @@ export const VocMap: React.FC = () => {
 
   // Prepare data
   useEffect(() => {
-    const countriesWithAnyData = getCountriesWithAnyData(data as VocDataRow[]);
     const mostRecentCountryData = getMostRecentCountryData(
       data as VocDataRow[]
     );
-    const list = getVocList(countriesWithAnyData);
     const mostRecentVocStateData = getMostRecentStatesData(
       data as VocDataRow[]
     );
 
     setVocStateData(mostRecentVocStateData);
     setVocCountryData(mostRecentCountryData);
-    setVocList(list);
-    setChosenVoc(list[0]);
   }, []);
 
   // Display countries and states on the map

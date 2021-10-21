@@ -2,7 +2,7 @@ import styled, { createGlobalStyle } from "styled-components";
 
 // Some styles are commented out not to override css from viz app
 export const GlobalStyle = createGlobalStyle`    
-    body {
+    /* body {
         margin: 0;
         font-family: 'Roboto', sans-serif;
         -webkit-font-smoothing: antialiased;
@@ -13,13 +13,14 @@ export const GlobalStyle = createGlobalStyle`
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-    }
+    } */
     a {
         text-decoration: none;
         outline: none;
         color: inherit;
     }   
     .custom-popup {
+        z-index: 1000;
         font-size: 16px;        
         width: auto;
         overflow: hidden;        
@@ -45,8 +46,7 @@ export const GlobalStyle = createGlobalStyle`
     }
     .mapboxgl-popup-content p {
         font-size: 14px;
-    }
-    }        
+    }          
 `;
 
 export const Card = styled.div`

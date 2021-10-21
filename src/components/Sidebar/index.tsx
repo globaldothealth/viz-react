@@ -36,7 +36,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   // Parse VoC and VoI from spreadsheet
   useEffect(() => {
-    if (error) alert(error);
+    if (error) {
+      alert(error);
+      return;
+    }
     if (!data || loading) return;
 
     const { VoC, VoI } = data[0].data[0] as { VoC: string; VoI: string };
@@ -50,6 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     setVocList(vocArray);
     setVoiList(voiArray);
+    handleVariantChange(vocArray[0]);
   }, [loading, data, error]);
 
   const handleVariantTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
