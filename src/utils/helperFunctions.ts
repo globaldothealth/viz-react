@@ -1,11 +1,18 @@
 import { parse, isAfter } from "date-fns";
 import { VocDataRow } from "../models/VocDataRow";
+import { VariantDataRow } from "../models/VariantDataRow";
 import { statesList, StatesData } from "../data/statesData";
 
 export enum DataStatus {
   CheckedHasData = 1,
   CheckedNoData = 0,
   NotChecked = "",
+}
+
+export enum BreakthroughStatus {
+  Yes = 1,
+  No = 0,
+  ToBeDetemined = "",
 }
 
 export const getCountriesWithAnyData = (data: VocDataRow[]): VocDataRow[] => {
@@ -136,6 +143,24 @@ export const sortData = (
   return { countriesWithData, countriesWithoutData, countriesNotChecked };
 };
 
+export const getBreakthroughStatusName = (
+  status: BreakthroughStatus
+): string => {
+  switch (status) {
+    case BreakthroughStatus.Yes:
+      return "Yes";
+
+    case BreakthroughStatus.No:
+      return "No";
+
+    case BreakthroughStatus.ToBeDetemined:
+      return "To be determined";
+
+    default:
+      return "-";
+  }
+};
+
 // Get source URL and date for specific country
 export const getDetailedData = (
   dataList: VocDataRow[],
@@ -150,11 +175,15 @@ export const getDetailedData = (
     (dataRow) => dataRow.code === location || dataRow.location === location
   );
 
+  const breakthroughStatus = chosenCountry[0]
+    .breakthrough_status as BreakthroughStatus;
+  const breakthrough = getBreakthroughStatusName(breakthroughStatus);
+
   return {
     sourceUrl: chosenCountry[0].source_url,
     countryName: chosenCountry[0].location,
     dateChecked: chosenCountry[0].epi_date,
-    breakthrough: chosenCountry[0].breakthrough_status,
+    breakthrough,
   };
 };
 
@@ -218,4 +247,24 @@ export const sortStatesData = (
   const statesNotChecked = filteredStates.map((row) => row.stateId);
 
   return { statesWithData, statesWithoutData, statesNotChecked };
+};
+
+// Parse variant data from Google spreadsheet
+export const parseVariantData = (
+  data: VariantDataRow[]
+): {
+  vocList: { pango: string; whoLabel: string }[];
+  voiList: { pango: string; whoLabel: string }[];
+} => {
+  const voc = data.filter((el) => el["is VoI"] === "0");
+  const voi = data.filter((el) => el["is VoI"] === "1");
+
+  const vocList = voc.map((vocEl) => {
+    return { pango: vocEl["Pango lineage"], whoLabel: vocEl["WHO label"] };
+  });
+  const voiList = voi.map((voiEl) => {
+    return { pango: voiEl["Pango lineage"], whoLabel: voiEl["WHO label"] };
+  });
+
+  return { vocList, voiList };
 };

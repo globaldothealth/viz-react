@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import useGoogleSheets from "use-google-sheets";
 
+import { VariantDataRow } from "../../models/VariantDataRow";
+import { parseVariantData } from "../../utils/helperFunctions";
 import {
   SidebarContainer,
   Label,
@@ -24,8 +26,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   handleVariantChange,
 }: SidebarProps) => {
   const [variantType, setVariantType] = useState(VariantType.VOC);
-  const [vocList, setVocList] = useState<string[]>([]);
-  const [voiList, setVoiList] = useState<string[]>([]);
+  const [vocArray, setVocArray] = useState<
+    { pango: string; whoLabel: string }[]
+  >([]);
+  const [voiArray, setVoiArray] = useState<
+    { pango: string; whoLabel: string }[]
+  >([]);
 
   // Get data from Google sheets
   const { data, loading, error } = useGoogleSheets({
@@ -42,18 +48,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
     if (!data || loading) return;
 
-    const { VoC, VoI } = data[0].data[0] as { VoC: string; VoI: string };
+    const { vocList, voiList } = parseVariantData(
+      data[0].data as VariantDataRow[]
+    );
 
-    let vocArray = VoC.split(";");
-    let voiArray = VoI.split(";");
-
-    // Remove white spaces from each array element
-    vocArray = vocArray.map((element) => element.trim());
-    voiArray = voiArray.map((element) => element.trim());
-
-    setVocList(vocArray);
-    setVoiList(voiArray);
-    handleVariantChange(vocArray[0]);
+    setVocArray(vocList);
+    setVoiArray(voiList);
+    handleVariantChange(vocList[0].pango);
   }, [loading, data, error]);
 
   const handleVariantTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     setVariantType(newVariantType);
     handleVariantChange(
-      newVariantType === VariantType.VOC ? vocList[0] : voiList[0]
+      newVariantType === VariantType.VOC ? vocArray[0].pango : voiArray[0].pango
     );
   };
 
@@ -70,21 +71,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <VariantSelectionContainer>
         <StyledRadio
           type="radio"
+          id="voc"
           name="voc"
           value={VariantType.VOC}
           checked={variantType === VariantType.VOC}
           onChange={handleVariantTypeChange}
         />
-        <Label htmlFor="voc">VoC</Label>
+        <Label htmlFor="voc">Variants of concern</Label>
 
         <StyledRadio
           type="radio"
+          id="voi"
           name="voi"
           value={VariantType.VOI}
           checked={variantType === VariantType.VOI}
           onChange={handleVariantTypeChange}
         />
-        <Label htmlFor="voi">VoI</Label>
+        <Label htmlFor="voi">Variants of interest</Label>
       </VariantSelectionContainer>
 
       {variantType === VariantType.VOC ? (
@@ -92,10 +95,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <Label block>Choose Variant of Concern</Label>
 
           <Select onChange={handleVariantChange}>
-            {vocList &&
-              vocList.map((voc) => (
-                <option key={voc} value={voc}>
-                  {voc.replace("total_", "")}
+            {vocArray &&
+              vocArray.map((voc) => (
+                <option key={voc.pango} value={voc.pango}>
+                  {voc.pango.replace("total_", "")} ({voc.whoLabel})
                 </option>
               ))}
           </Select>
@@ -105,10 +108,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <Label block>Choose Variant of Interest</Label>
 
           <Select onChange={handleVariantChange}>
-            {voiList &&
-              voiList.map((voi) => (
-                <option key={voi} value={voi}>
-                  {voi.replace("total_", "")}
+            {voiArray &&
+              voiArray.map((voi) => (
+                <option key={voi.pango} value={voi.pango}>
+                  {voi.pango.replace("total_", "")} ({voi.whoLabel})
                 </option>
               ))}
           </Select>
