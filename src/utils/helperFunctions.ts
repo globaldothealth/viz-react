@@ -256,14 +256,20 @@ export const parseVariantData = (
   vocList: { pango: string; whoLabel: string }[];
   voiList: { pango: string; whoLabel: string }[];
 } => {
-  const voc = data.filter((el) => el["is VoI"] === "0");
-  const voi = data.filter((el) => el["is VoI"] === "1");
+  const voc = data.filter((el) => el["is VoI"].trim() === "0");
+  const voi = data.filter((el) => el["is VoI"].trim() === "1");
 
   const vocList = voc.map((vocEl) => {
-    return { pango: vocEl["Pango lineage"], whoLabel: vocEl["WHO label"] };
+    return {
+      pango: vocEl["Pango lineage"].trim(),
+      whoLabel: vocEl["WHO label"].trim(),
+    };
   });
   const voiList = voi.map((voiEl) => {
-    return { pango: voiEl["Pango lineage"], whoLabel: voiEl["WHO label"] };
+    return {
+      pango: voiEl["Pango lineage"].trim(),
+      whoLabel: voiEl["WHO label"].trim(),
+    };
   });
 
   return { vocList, voiList };
