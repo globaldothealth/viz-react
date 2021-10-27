@@ -78,18 +78,20 @@ export const VocMap: React.FC = () => {
     dateChecked: string,
     breakthrough: string
   ): string =>
-    `<h2>${countryName}</h2>
+    `<h2 className="popup-title">${countryName}</h2>
     <hr>
+    <strong>Date checked:</strong> ${dateChecked}
+    <br />
+    <strong>Breakthrough infections by variant reported:</strong> ${breakthrough}
     <p>
       ${
         sourceUrl && sourceUrl !== ""
-          ? `<a class="button" href="${sourceUrl}" target="_blank">
+          ? `<a class="popup" href="${sourceUrl}" target="_blank">
               Go To Public Source
             </a>`
           : `Source not available`
       }
-    </p>
-    <p><strong>Date checked:</strong> ${dateChecked}</p><p><strong>Breakthrough infections by variant reported:</strong> ${breakthrough}</p>`;
+    </p>`;
 
   // Setup Mapbox and configure map
   useEffect(() => {
@@ -212,7 +214,11 @@ export const VocMap: React.FC = () => {
         locationCode
       );
 
-    new mapboxgl.Popup({ className: "custom-popup" })
+    new mapboxgl.Popup({
+      className: "custom-popup",
+      closeButton: false,
+      closeOnMove: true,
+    })
       .setHTML(
         renderedPopupContent(sourceUrl, countryName, dateChecked, breakthrough)
       )
