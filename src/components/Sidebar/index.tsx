@@ -121,7 +121,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </>
       )}
 
-      <SidebarTab onClick={() => setSidebarHidden(!sidebarHidden)}>
+      <SidebarTab
+        onClick={() =>
+          setSidebarHidden((currentSidebarHidden) => !currentSidebarHidden)
+        }
+      >
         <SidebarTabIcon sidebarHidden={sidebarHidden}>◀</SidebarTabIcon>
       </SidebarTab>
     </SidebarContainer>
