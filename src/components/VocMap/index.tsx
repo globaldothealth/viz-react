@@ -38,19 +38,19 @@ const layers = [
     id: "checked-has-data",
     color: FillColor.CheckedHasData,
     outline: OutlineColor.CheckedHasData,
-    label: "Checked, has data",
+    label: "Reporting",
   },
   {
     id: "checked-no-data",
     color: FillColor.CheckedNoData,
     outline: OutlineColor.CheckedNoData,
-    label: "Checked, does not have data",
+    label: "Not reporting",
   },
   {
     id: "not-checked",
     color: FillColor.NotChecked,
     outline: OutlineColor.NotChecked,
-    label: "Not checked",
+    label: "To be determined",
   },
 ];
 
@@ -78,8 +78,20 @@ export const VocMap: React.FC = () => {
     dateChecked: string,
     breakthrough: string
   ): string =>
-    `<h2>${countryName}</h2><hr><p><a class="button" href="${sourceUrl}" target="_blank">Go To Source</a></p>
-    <p><strong>Date checked:</strong> ${dateChecked}</p><p><strong>Breakthrough Status:</strong> ${breakthrough}</p>`;
+    `<h2 className="popup-title">${countryName}</h2>
+    <hr>
+    <strong>Date checked:</strong> ${dateChecked}
+    <br />
+    <strong>Breakthrough infections by variant reported:</strong> ${breakthrough}
+    <p>
+      ${
+        sourceUrl && sourceUrl !== ""
+          ? `<a class="popup" href="${sourceUrl}" target="_blank">
+              Go To Public Source
+            </a>`
+          : `Source not available`
+      }
+    </p>`;
 
   // Setup Mapbox and configure map
   useEffect(() => {
@@ -202,7 +214,11 @@ export const VocMap: React.FC = () => {
         locationCode
       );
 
-    new mapboxgl.Popup({ className: "custom-popup" })
+    new mapboxgl.Popup({
+      className: "custom-popup",
+      closeButton: false,
+      closeOnMove: true,
+    })
       .setHTML(
         renderedPopupContent(sourceUrl, countryName, dateChecked, breakthrough)
       )

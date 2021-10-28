@@ -18,6 +18,7 @@ export const Label = styled.label<LabelProps>`
   ${(props) =>
     props.block &&
     `
+      margin-left: 0;
       display: block;
       margin-bottom: 10px;      
   `}
@@ -33,7 +34,7 @@ export const Select = styled.select`
 export const VariantSelectionContainer = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 `;
 
 export const StyledRadio = styled.input`

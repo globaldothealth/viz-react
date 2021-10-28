@@ -2,6 +2,7 @@ import styled, { createGlobalStyle } from "styled-components";
 
 // Some styles are commented out not to override css from viz app
 export const GlobalStyle = createGlobalStyle`    
+    /* START COMMENT (PRODUCTION) */
     body {
         margin: 0;
         font-family: 'Roboto', sans-serif;
@@ -18,20 +19,26 @@ export const GlobalStyle = createGlobalStyle`
         text-decoration: none;
         outline: none;
         color: inherit;        
-    }   
+    }
+    /* END COMMENT (PRODUCTION) */
+
     .custom-popup {
         z-index: 1000;
-        font-size: 16px;        
+        font-size: 12px;
         width: auto;
-        overflow: hidden;        
+        overflow: hidden;            
     }
     .mapboxgl-popup-content h2 {
-        display: block;
-        margin-bottom: 10px;
-        line-height: 1.2em;
-        margin: 0;
+        text-align: left;
+        display: block;        
+        margin: 0 0 10px 0;
+        font-size: 24px;        
+        font-weight: 400;
+        font-family: Mabry Pro, Inter, Helvetica, Arial, sans-serif;
     }
-    .mapboxgl-popup-content .button {
+
+    /* START COMMENT (PRODUCTION) */
+    .mapboxgl-popup-content .popup {
         background: #0094e2;
         padding: 5px 15px;
         margin: 10px 0;
@@ -44,11 +51,12 @@ export const GlobalStyle = createGlobalStyle`
 
     .mapboxgl-popup-content .button:hover {
         background: #007AEC;
-    }
+    } 
     .mapboxgl-popup-content p {
         font-size: 14px;
         margin: 0;
-    }          
+    }
+    /* END COMMENT (PRODUCTION) */
 `;
 
 export const Card = styled.div`
