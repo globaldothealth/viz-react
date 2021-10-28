@@ -63,6 +63,6 @@ export const Card = styled.div`
   position: absolute;
   background-color: white;
   z-index: 100;
-  padding: 2rem;
+  padding: 2ex;
   border-radius: 0.5rem;
 `;

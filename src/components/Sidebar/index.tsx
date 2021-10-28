@@ -9,6 +9,8 @@ import {
   Select,
   VariantSelectionContainer,
   StyledRadio,
+  SidebarTab,
+  SidebarTabIcon,
 } from "./styled";
 
 interface SidebarProps {
@@ -32,6 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [voiArray, setVoiArray] = useState<
     { pango: string; whoLabel: string }[]
   >([]);
+  const [sidebarHidden, setSidebarHidden] = useState(false);
 
   // Get data from Google sheets
   const { data, loading, error } = useGoogleSheets({
@@ -67,7 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <SidebarContainer>
+    <SidebarContainer sidebarHidden={sidebarHidden}>
       <VariantSelectionContainer>
         <StyledRadio
           type="radio"
@@ -117,6 +120,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </Select>
         </>
       )}
+
+      <SidebarTab
+        onClick={() =>
+          setSidebarHidden((currentSidebarHidden) => !currentSidebarHidden)
+        }
+      >
+        <SidebarTabIcon sidebarHidden={sidebarHidden}>◀</SidebarTabIcon>
+      </SidebarTab>
     </SidebarContainer>
   );
 };
