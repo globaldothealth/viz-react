@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const LegendContainer = styled.div`
   position: absolute;
-  top: 10ex;
+  top: 5.5rem;
   right: 1rem;
   padding: 0.5rem 0.25rem;
   border-radius: 0.2rem;
@@ -17,7 +17,7 @@ export const LegendContainer = styled.div`
 
 export const Title = styled.p`
   font-weight: bold;
-  margin-bottom: 8px;
+  margin: 0 0 8px 0;
   color: #333333;
 `;
 
@@ -42,6 +42,6 @@ export const ColorSample = styled.div<ColorSampleProps>`
 `;
 
 export const Label = styled.p`
-  margin-top: 2px;
+  margin: 2px 0 0 0;
   color: #333333;
 `;

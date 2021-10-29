@@ -16,7 +16,7 @@ interface LegendProps {
 export const Legend: React.FC<LegendProps> = ({ layers }: LegendProps) => {
   return (
     <LegendContainer>
-      <Title>Legend</Title>
+      <Title>Variant Reporting</Title>
 
       {layers.map((layer) => (
         <LegendRow key={layer.id}>
