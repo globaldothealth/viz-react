@@ -80,7 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           checked={variantType === VariantType.VOC}
           onChange={handleVariantTypeChange}
         />
-        <Label htmlFor="voc">Variants of concern</Label>
+        <Label htmlFor="voc">Variants of Concern</Label>
 
         <StyledRadio
           type="radio"
@@ -90,7 +90,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           checked={variantType === VariantType.VOI}
           onChange={handleVariantTypeChange}
         />
-        <Label htmlFor="voi">Variants of interest</Label>
+        <Label htmlFor="voi">Variants of Interest</Label>
       </VariantSelectionContainer>
 
       {variantType === VariantType.VOC ? (
