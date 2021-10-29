@@ -1,18 +1,22 @@
 import styled from "styled-components";
-import { Card } from "../../theme/globalStyles";
 
 interface SidebarContainerProps {
   sidebarHidden: boolean;
 }
 
-export const SidebarContainer = styled(Card)<SidebarContainerProps>`
+export const SidebarContainer = styled.div<SidebarContainerProps>`
+  position: absolute;
+  z-index: 100;
   top: 15%;
   left: 2ex;
   width: 18rem;
   margin-top: 0;
+  padding: 2ex;
+  background-color: white;
   box-shadow: 0 10px 30px 1px rgb(0 0 0 / 10%);
   backdrop-filter: blur(0.5rem);
   transition: left 0.2s;
+  border-radius: 0.5rem;
 
   ${(props) =>
     props.sidebarHidden &&

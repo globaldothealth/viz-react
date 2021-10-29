@@ -4,13 +4,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { VocDataRow } from "../../models/VocDataRow";
 
 import data from "../../data/voc-new.json";
-import {
-  MapContainer,
-  Legend,
-  LegendRow,
-  LegendColorSample,
-  LegendLabel,
-} from "./styled";
+import { MapContainer } from "./styled";
 import {
   getMostRecentCountryData,
   getMostRecentStatesData,
@@ -19,21 +13,11 @@ import {
   sortStatesData,
 } from "../../utils/helperFunctions";
 import { Sidebar } from "../Sidebar";
-
-enum FillColor {
-  CheckedHasData = "#29b1ea",
-  CheckedNoData = "#88d0eb",
-  NotChecked = "#FD9986",
-}
-
-enum OutlineColor {
-  CheckedHasData = "#0074ab",
-  CheckedNoData = "#007AEC",
-  NotChecked = "#FD685B",
-}
+import { Legend } from "../Legend";
+import { MapLayer, FillColor, OutlineColor } from "../../models/MapLayer";
 
 // Layers to be displayed on map
-const layers = [
+const layers: MapLayer[] = [
   {
     id: "checked-has-data",
     color: FillColor.CheckedHasData,
@@ -311,20 +295,13 @@ export const VocMap: React.FC = () => {
     setChosenVoc(typeof e === "string" ? e : e.target.value);
   };
 
-  const renderedLabelItems = layers.map((layer) => (
-    <LegendRow key={layer.id}>
-      <LegendColorSample color={layer.color} />
-      <LegendLabel>{layer.label}</LegendLabel>
-    </LegendRow>
-  ));
-
   return (
     <>
       <MapContainer ref={mapContainer} />
 
       <Sidebar handleVariantChange={handleVariantChange} />
 
-      <Legend>{renderedLabelItems}</Legend>
+      <Legend layers={layers} />
     </>
   );
 };

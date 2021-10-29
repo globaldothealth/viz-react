@@ -1,4 +1,4 @@
-import styled, { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from "styled-components";
 
 // Some styles are commented out not to override css from viz app
 export const GlobalStyle = createGlobalStyle`    
@@ -57,12 +57,4 @@ export const GlobalStyle = createGlobalStyle`
         margin: 0;
     }
     /* END COMMENT (PRODUCTION) */
-`;
-
-export const Card = styled.div`
-  position: absolute;
-  background-color: white;
-  z-index: 100;
-  padding: 2ex;
-  border-radius: 0.5rem;
 `;
