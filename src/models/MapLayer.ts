@@ -2,6 +2,7 @@ export enum FillColor {
   CheckedHasData = "#29b1ea",
   CheckedNoData = "#88d0eb",
   NotChecked = "#FD9986",
+  NoData = "#D7E9ED",
 }
 
 export enum OutlineColor {

@@ -47,7 +47,7 @@ export const GlobalStyle = createGlobalStyle`
         text-transform: uppercase;
         border-radius: 4px;
         display: inline-block;        
-    }
+    } 
 
     .mapboxgl-popup-content .button:hover {
         background: #007AEC;

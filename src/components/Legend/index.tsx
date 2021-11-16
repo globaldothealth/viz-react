@@ -1,6 +1,6 @@
 import React from "react";
 
-import { MapLayer } from "../../models/MapLayer";
+import { MapLayer, FillColor } from "../../models/MapLayer";
 import {
   LegendContainer,
   Title,
@@ -24,6 +24,11 @@ export const Legend: React.FC<LegendProps> = ({ layers }: LegendProps) => {
           <Label>{layer.label}</Label>
         </LegendRow>
       ))}
+
+      <LegendRow>
+        <ColorSample color={FillColor.NoData} />
+        <Label>No data</Label>
+      </LegendRow>
     </LegendContainer>
   );
 };

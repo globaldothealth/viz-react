@@ -15,13 +15,13 @@ export enum BreakthroughStatus {
   ToBeDetemined = "",
 }
 
-export const getCountriesWithAnyData = (data: VocDataRow[]): VocDataRow[] => {
-  return data.filter((row) => row.any_variant_info === 1 && row.code !== "USA");
+export const getNonUsData = (data: VocDataRow[]): VocDataRow[] => {
+  return data.filter((row) => row.code !== "USA");
 };
 
 // Get only the most recent data for each country from the list
 export const getMostRecentCountryData = (data: VocDataRow[]) => {
-  const dataWithAnyInfo = getCountriesWithAnyData(data);
+  const dataWithAnyInfo = getNonUsData(data);
 
   const locations: string[] = [];
   dataWithAnyInfo.forEach((row) => {
@@ -64,10 +64,7 @@ export const getMostRecentStatesData = (data: VocDataRow[]): VocDataRow[] => {
   // Get states data with any info
   const statesNames = statesList.map((state) => state.name);
   const stateRowsWithVocData = data.filter(
-    (row) =>
-      statesNames.includes(row.location) &&
-      row.code === "USA" &&
-      row.any_variant_info === 1
+    (row) => statesNames.includes(row.location) && row.code === "USA"
   );
 
   // Get the most recent data
