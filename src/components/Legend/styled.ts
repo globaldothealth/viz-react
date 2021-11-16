@@ -30,7 +30,7 @@ export const LegendRow = styled.div`
 
 interface ColorSampleProps {
   color: string;
-  outlineColor: string;
+  outlineColor?: string;
 }
 
 export const ColorSample = styled.div<ColorSampleProps>`
@@ -38,7 +38,7 @@ export const ColorSample = styled.div<ColorSampleProps>`
   height: 12px;
   border-radius: 50%;
   background-color: ${(props) => props.color};
-  border-color: ${(props) => props.outlineColor};
+  border-color: ${(props) => (props.outlineColor ? props.outlineColor : "")};
 `;
 
 export const Label = styled.p`
